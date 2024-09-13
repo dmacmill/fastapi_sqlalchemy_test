@@ -10,7 +10,7 @@ class MedicationBase(BaseModel):
     stock: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class MedicationCreate(MedicationBase):
@@ -25,7 +25,7 @@ class PatientBase(BaseModel):
     insurance_type: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class PatientCreate(PatientBase):
@@ -43,7 +43,7 @@ class PerscriptionBase(BaseModel):
     doctor_name: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class PerscriptionCreate(PerscriptionBase):
@@ -85,7 +85,7 @@ Patient.update_forward_refs()
 #     owner_id: int
 
 #     class Config:
-#         orm_mode = True
+#         from_attributes = True
 
 
 # class UserBase(BaseModel):
@@ -102,4 +102,4 @@ Patient.update_forward_refs()
 #     items: list[Item] = []
 
 #     class Config:
-#         orm_mode = True
+#         from_attributes = True

@@ -1,23 +1,23 @@
+from datetime import date
 from typing import List
 
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Date
+from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
-from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import relationship
 
 from .db import Base
 
 
-class Medication(DeclarativeBase):
+class Medication(Base):
     __tablename__ = "medications"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(unique=True, index=True, default=True, nullable=False)
     use_case: Mapped[str] = mapped_column()
-    stock: Mapped[int] = mapped_column(nullable=False, server_default=0)
+    stock: Mapped[int] = mapped_column(nullable=False, server_default="0")
 
-    perscriptions: Mapped[List["Perscriptions"]] = relationship(back_populates="patient")
+    perscriptions: Mapped[List["Perscription"]] = relationship(back_populates="patient")
 
 
 # class Medication(Base):
@@ -30,7 +30,7 @@ class Medication(DeclarativeBase):
 
 #     perscriptions = relationship("Perscription", back_populates="perscriptions")
 
-class Patient(DeclarativeBase):
+class Patient(Base):
     __tablename__ = "patients"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -40,7 +40,7 @@ class Patient(DeclarativeBase):
     insurance_num: Mapped[str] = mapped_column()
     insurance_type: Mapped[str] = mapped_column()
 
-    perscriptions: Mapped[List["Perscriptions"]] = relationship(back_populates="patient")
+    perscriptions: Mapped[List["Perscription"]] = relationship(back_populates="patient")
 
 # class Patient(Base):
 #     __tablename__ = "patients"
@@ -55,7 +55,7 @@ class Patient(DeclarativeBase):
 #     perscriptions = relationship("Perscription", back_populates="perscriptions")
 
 
-class Perscriptions(DeclarativeBase):
+class Perscription(Base):
     __tablename__ = "perscriptions"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -65,7 +65,7 @@ class Perscriptions(DeclarativeBase):
     every: Mapped[str] = mapped_column(default=True, nullable=False)
     amount: Mapped[int] = mapped_column(default=True, nullable=False)
     refills: Mapped[int] = mapped_column(default=True, nullable=False)
-    last_filled: Mapped[Date] = mapped_column()
+    last_filled: Mapped[date] = mapped_column()
     day_supply: Mapped[int] = mapped_column(nullable=False)
     doctor_name: Mapped[str] = mapped_column(default=True)
 

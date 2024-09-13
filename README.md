@@ -14,3 +14,5 @@ So I will endeavor to write an ORM based backend now. Using [https://fastapi.tia
 Run `pipenv shell` to enter dev environment
 
 Then run `fastapi dev` and go to localhost:8000/docs
+
+`uvicorn app.main:app --reload` when running with these instructions: https://fastapi.tiangolo.com/tutorial/sql-databases/
