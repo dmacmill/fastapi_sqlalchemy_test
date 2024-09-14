@@ -20,8 +20,8 @@ settings = {
     "POSTGRES_POOL_SIZE": config("POSTGRES_POOL_SIZE", cast=int, default=5),
 }
 
-
-DB_URI = "postgresql+asyncpg://{}:{}@{}:{}/{}".format(
+# TODO: Figure out what can make asyncpg work with SQLAlchemy
+DB_URI = "postgresql+psycopg://{}:{}@{}:{}/{}".format(
     settings["POSTGRES_USER"],
     settings["POSTGRES_PASSWORD"],
     settings["POSTGRES_HOST"],
