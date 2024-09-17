@@ -47,10 +47,16 @@ def hello_world():
 
 # Notice there is no "async def", this is because SQLAlchemy is too stupid for this.
 @app.get("/all_medications")
-def all_medications():
+def all_medications(db: Session = Depends(get_db)):
     # Notice that the values you return are SQLAlchemy models, or lists of SQLAlchemy models.
     #
     # But as all the path operations have a response_model with Pydantic models / schemas using orm_mode, the data declared 
     # in your Pydantic models will be extracted from them and returned to the client, with all the normal filtering and validation.
-    meds = crud.get_all_medications()
+    meds = crud.get_all_medications(db)
     return meds
+
+
+@app.post("/medication", response_model=schemas.Medication)
+def create_medication(med: schemas.MedicationCreate,
+                      db: Session = Depends(get_db)):
+    return crud.create_medication(db=db, medication=med)

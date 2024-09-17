@@ -10,18 +10,18 @@ from .db import Base
 
 
 class Medication(Base):
-    __tablename__ = "medications"
+    __tablename__ = "medications_table"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(unique=True, index=True, default=True, nullable=False)
     use_case: Mapped[str] = mapped_column()
     stock: Mapped[int] = mapped_column(nullable=False, server_default="0")
 
-    perscriptions: Mapped[List["Perscription"]] = relationship(back_populates="patient", lazy="selectin")
+    perscriptions: Mapped[List["Perscription"]] = relationship(back_populates="medication")
 
 
 class Patient(Base):
-    __tablename__ = "patients"
+    __tablename__ = "patients_table"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(index=True, default=True, nullable=False)
@@ -30,15 +30,15 @@ class Patient(Base):
     insurance_num: Mapped[str] = mapped_column()
     insurance_type: Mapped[str] = mapped_column()
 
-    perscriptions: Mapped[List["Perscription"]] = relationship(back_populates="patient", lazy="selectin")
+    perscriptions: Mapped[List["Perscription"]] = relationship(back_populates="patient")
 
 
 class Perscription(Base):
-    __tablename__ = "perscriptions"
+    __tablename__ = "perscriptions_table"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    medication_id: Mapped[int] = mapped_column(ForeignKey("medications.id"))
-    patient_id: Mapped[int] = mapped_column(ForeignKey("patients.id"))
+    medication_id: Mapped[int] = mapped_column(ForeignKey("medications_table.id"))
+    patient_id: Mapped[int] = mapped_column(ForeignKey("patients_table.id"))
     dose: Mapped[str] = mapped_column(default=True, nullable=False)
     every: Mapped[str] = mapped_column(default=True, nullable=False)
     amount: Mapped[int] = mapped_column(default=True, nullable=False)

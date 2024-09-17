@@ -66,8 +66,8 @@ class Perscription(PerscriptionBase):
     patient: PatientBase
 
 
-Medication.update_forward_refs()
-Patient.update_forward_refs()
+Medication.model_rebuild()
+Patient.model_rebuild()
 
 ##################
 ###################
