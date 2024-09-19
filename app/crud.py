@@ -19,15 +19,22 @@ def get_all_perscriptions(db: Session):
 
 
 def get_medication(db: Session, medication_id: int):
-    return db.query(models.Medication).filter(models.Medication.id == medication_id).first()
-
+    res = db.query(models.Medication).filter(models.Medication.id == medication_id).first()
+    if res is None:
+        raise HTTPException(status_code=404, detail="medication with id {} not found".format(medication_id))
+    return res
 
 def get_patient(db: Session, patient_id: int):
-    return db.query(models.Patient).filter(models.Patient.id == patient_id).first()
-
+    res =  db.query(models.Patient).filter(models.Patient.id == patient_id).first()
+    if res is None:
+        raise HTTPException(status_code=404, detail="patient with id {} not found".format(patient_id))
+    return res
 
 def get_perscription(db: Session, perscription_id: int):
-    return db.query(models.Perscription).filter(models.Perscription.id == perscription_id).first()
+    res = db.query(models.Perscription).filter(models.Perscription.id == perscription_id).first()
+    if res is None:
+        raise HTTPException(status_code=404, detail="perscription with id {} not found".format(perscription_id))
+    return res
 
 
 def update_medication(db: Session, medication_id: int, medication: models.Medication):
@@ -63,7 +70,6 @@ def update_perscription(db: Session, perscription_id: int, perscription: models.
     if res is None:
         raise HTTPException(status_code=404, detail="perscription with id {} not found".format(perscription_id))
     res.update(dict(
-        name=perscription.name,
         medication_id=perscription.medication_id,
         patient_id=perscription.patient_id,
         dose=perscription.dose,
@@ -93,8 +99,10 @@ def create_medication(db: Session, medication: models.Medication):
 def create_patient(db: Session, patient: models.Patient):
     db_patient = models.Patient(
         name=patient.name,
-        use_case=patient.use_case,
-        stock=patient.stock
+        phone_num=patient.phone_num,
+        email=patient.email,
+        insurance_num=patient.insurance_num,
+        insurance_type=patient.insurance_type
     )
     db.add(db_patient)
     db.commit()
@@ -104,9 +112,15 @@ def create_patient(db: Session, patient: models.Patient):
 
 def create_perscription(db: Session, perscription: models.Perscription):
     db_per = models.Perscription(
-        name=perscription.name,
-        use_case=perscription.use_case,
-        stock=perscription.stock
+        medication_id=perscription.medication_id,
+        patient_id=perscription.patient_id,
+        dose=perscription.dose,
+        every=perscription.every,
+        amount=perscription.amount,
+        refills=perscription.refills,
+        last_filled=perscription.last_filled,
+        day_supply=perscription.day_supply,
+        doctor_name=perscription.doctor_name
     )
     db.add(db_per)
     db.commit()
