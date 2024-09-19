@@ -32,6 +32,8 @@ def get_perscription(db: Session, perscription_id: int):
 
 def update_medication(db: Session, medication_id: int, medication: models.Medication):
     res = db.query(models.Medication).filter(models.Medication.id == medication_id).first()
+    if res is None:
+        raise HTTPException(status_code=404, detail="medication with id {} not found".format(medication_id))
     res.update(dict(
         name=medication.name,
         use_case=medication.use_case,
@@ -43,6 +45,8 @@ def update_medication(db: Session, medication_id: int, medication: models.Medica
 
 def update_patient(db: Session, patient_id: int, patient: models.Patient):
     res = db.query(models.Patient).filter(models.Patient.id == patient_id).first()
+    if res is None:
+        raise HTTPException(status_code=404, detail="patient with id {} not found".format(patient_id))
     res.update(dict(
         name=patient.name,
         phone_num=patient.phone_num,
@@ -56,6 +60,8 @@ def update_patient(db: Session, patient_id: int, patient: models.Patient):
 
 def update_perscription(db: Session, perscription_id: int, perscription: models.Perscription):
     res = db.query(models.Perscription).filter(models.Perscription.id == perscription_id).first()
+    if res is None:
+        raise HTTPException(status_code=404, detail="perscription with id {} not found".format(perscription_id))
     res.update(dict(
         name=perscription.name,
         medication_id=perscription.medication_id,
