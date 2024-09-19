@@ -16,3 +16,11 @@ engine = create_engine(DB_URI)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)  # creates db sessions
 
 Base = declarative_base()  # inherit from this in the /models dir
+
+# Dependency
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
