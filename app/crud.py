@@ -1,18 +1,21 @@
+from fastapi import HTTPException
+
 from sqlalchemy.orm import Session
+from sqlalchemy import asc
 
 from . import models, schemas
 
 
 def get_all_medications(db: Session):
-    return db.query(models.Medication).all()
+    return db.query(models.Medication).order_by(models.Medication.id, asc(models.Medication.id)).all()
 
 
 def get_all_patients(db: Session):
-    return db.query(models.Patient).all()
+    return db.query(models.Patient).order_by(models.Patient.id, asc(models.Patient.id)).all()
 
 
 def get_all_perscriptions(db: Session):
-    return db.query(models.Perscription).all()
+    return db.query(models.Perscription).order_by(models.Perscription.id, asc(models.Perscription.id)).all()
 
 
 def get_medication(db: Session, medication_id: int):
@@ -39,7 +42,7 @@ def update_medication(db: Session, medication_id: int, medication: models.Medica
     
 
 def update_patient(db: Session, patient_id: int, patient: models.Patient):
-    res = db.query(models.patient).filter(models.patient.id == patient_id).first()
+    res = db.query(models.Patient).filter(models.Patient.id == patient_id).first()
     res.update(dict(
         name=patient.name,
         phone_num=patient.phone_num,
@@ -52,7 +55,7 @@ def update_patient(db: Session, patient_id: int, patient: models.Patient):
 
 
 def update_perscription(db: Session, perscription_id: int, perscription: models.Perscription):
-    res = db.query(models.perscription).filter(models.perscription.id == perscription_id).first()
+    res = db.query(models.Perscription).filter(models.Perscription.id == perscription_id).first()
     res.update(dict(
         name=perscription.name,
         medication_id=perscription.medication_id,
@@ -103,3 +106,30 @@ def create_perscription(db: Session, perscription: models.Perscription):
     db.commit()
     db.refresh(db_per)
     return db_per
+
+
+def delete_medication(db: Session, id: int):
+    med = db.query(models.Medication).filter(models.Medication.id == id).first()
+    if med is None:
+        raise HTTPException(status_code=404, detail="medication with id {} not found".format(id))
+    db.delete(med)
+    db.commit()
+    return med
+
+
+def delete_patient(db: Session, id: int):
+    patient = db.query(models.Patient).filter(models.Patient.id == id).first()
+    if patient is None:
+        raise HTTPException(status_code=404, detail="paitent with id {} not found".format(id))
+    db.delete(patient)
+    db.commit()
+    return patient
+
+
+def delete_perscription(db: Session, id: int):
+    perscription = db.query(models.Perscription).filter(models.Perscription.id == id).first()
+    if perscription is None:
+        raise HTTPException(status_code=404, detail="perscription with id {} not found".format(id))
+    db.delete(perscription)
+    db.commit()
+    return perscription

@@ -60,3 +60,16 @@ def all_medications(db: Session = Depends(get_db)):
 def create_medication(med: schemas.MedicationCreate,
                       db: Session = Depends(get_db)):
     return crud.create_medication(db=db, medication=med)
+
+
+@app.patch("/medication", response_model=schemas.Medication)
+def update_medication(id: int,
+                      med: schemas.MedicationCreate,
+                      db: Session = Depends(get_db)):
+    return crud.update_medication(db, id, med)
+
+
+@app.delete("/medication")
+def delete_medication(id: int,
+                      db: Session = Depends(get_db)):
+    return crud.delete_medication(db, id)
