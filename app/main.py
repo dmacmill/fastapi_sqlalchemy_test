@@ -1,4 +1,4 @@
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
@@ -6,9 +6,9 @@ import logging
 logging.basicConfig()    
 logging.getLogger("sqlalchemy.engine").setLevel(logging.DEBUG)
 
-
-from . import crud, models, schemas
-from .db import SessionLocal, engine
+from app.api.api import router
+from app import models
+from app.db import engine
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -28,48 +28,10 @@ app.add_middleware(
     allow_headers=['*']
 )
 
-# Dependency
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
+app.include_router(router, prefix="/api")
 
 # our shit, TODO: move to app/app.py type thing
 @app.get("/")
 def hello_world():
     message = f"Hello world!"
     return {"message": message}
-
-
-# Notice there is no "async def", this is because SQLAlchemy is too stupid for this.
-@app.get("/all_medications")
-def all_medications(db: Session = Depends(get_db)):
-    # Notice that the values you return are SQLAlchemy models, or lists of SQLAlchemy models.
-    #
-    # But as all the path operations have a response_model with Pydantic models / schemas using orm_mode, the data declared 
-    # in your Pydantic models will be extracted from them and returned to the client, with all the normal filtering and validation.
-    meds = crud.get_all_medications(db)
-    return meds
-
-
-@app.post("/medication", response_model=schemas.Medication)
-def create_medication(med: schemas.MedicationCreate,
-                      db: Session = Depends(get_db)):
-    return crud.create_medication(db=db, medication=med)
-
-
-@app.patch("/medication", response_model=schemas.Medication)
-def update_medication(id: int,
-                      med: schemas.MedicationCreate,
-                      db: Session = Depends(get_db)):
-    return crud.update_medication(db, id, med)
-
-
-@app.delete("/medication")
-def delete_medication(id: int,
-                      db: Session = Depends(get_db)):
-    return crud.delete_medication(db, id)
