@@ -2,6 +2,8 @@ from pydantic import BaseModel
 
 from datetime import date
 
+from typing import List, Optional
+
 
 # TODO: separate these and add in /models dir
 class MedicationBase(BaseModel):
@@ -34,13 +36,15 @@ class PatientCreate(PatientBase):
 
 # Perscription
 class PerscriptionBase(BaseModel):
+    medication_id: int
+    patient_id: int
     dose: str
     every: str
     amount: int
     refills: int
-    last_filled: date
+    last_filled: Optional[date]
     day_supply: int
-    doctor_name: str
+    doctor_name: Optional[str]
 
     class Config:
         from_attributes = True

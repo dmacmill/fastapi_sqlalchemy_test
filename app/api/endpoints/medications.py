@@ -19,20 +19,26 @@ def all_medications(db: Session = Depends(get_db)):
     return meds
 
 
+@router.get("/medication/{id}", response_model=schemas.Medication)
+def get_medication(id: int, 
+                   db: Session = Depends(get_db)):
+    return crud.get_medication(db=db, medication_id=id)
+
+
 @router.post("/medication", response_model=schemas.Medication)
 def create_medication(med: schemas.MedicationCreate,
                       db: Session = Depends(get_db)):
     return crud.create_medication(db=db, medication=med)
 
 
-@router.patch("/medication", response_model=schemas.Medication)
+@router.patch("/medication/{id}", response_model=schemas.Medication)
 def update_medication(id: int,
                       med: schemas.MedicationCreate,
                       db: Session = Depends(get_db)):
     return crud.update_medication(db, id, med)
 
 
-@router.delete("/medication")
+@router.delete("/medication/{id}")
 def delete_medication(id: int,
                       db: Session = Depends(get_db)):
     return crud.delete_medication(db, id)

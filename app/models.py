@@ -1,5 +1,5 @@
 from datetime import date
-from typing import List
+from typing import List, Optional
 
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped
@@ -55,14 +55,16 @@ class Perscription(Base):
     every: Mapped[str] = mapped_column(default=True, nullable=False)
     amount: Mapped[int] = mapped_column(default=True, nullable=False)
     refills: Mapped[int] = mapped_column(default=True, nullable=False)
-    last_filled: Mapped[date] = mapped_column()
+    last_filled: Mapped[Optional[date]]
     day_supply: Mapped[int] = mapped_column(nullable=False)
-    doctor_name: Mapped[str] = mapped_column(default=True)
+    doctor_name: Mapped[Optional[str]]
 
     medication: Mapped["Medication"] = relationship(back_populates="perscriptions")
     patient: Mapped["Patient"] = relationship(back_populates="perscriptions")
 
     def update(self, d):
+        self.medication_id = d["medication_id"]
+        self.patient_id = d["patient_id"]
         self.dose = d["dose"]
         self.every = d["every"]
         self.amount = d["amount"]
