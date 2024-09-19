@@ -19,6 +19,11 @@ class Medication(Base):
 
     perscriptions: Mapped[List["Perscription"]] = relationship(back_populates="medication")
 
+    def update(self, d):
+        self.name = d["name"]
+        self.use_case = d["use_case"]
+        self.stock = d["stock"]
+
 
 class Patient(Base):
     __tablename__ = "patients_table"
@@ -31,6 +36,13 @@ class Patient(Base):
     insurance_type: Mapped[str] = mapped_column()
 
     perscriptions: Mapped[List["Perscription"]] = relationship(back_populates="patient")
+
+    def update(self, d):
+        self.name = d["name"]
+        self.phone_num = d["phone_num"]
+        self.email = d["email"]
+        self.insurance_num = d["insurance_num"]
+        self.insurance_type = d["insurance_type"]
 
 
 class Perscription(Base):
@@ -49,3 +61,12 @@ class Perscription(Base):
 
     medication: Mapped["Medication"] = relationship(back_populates="perscriptions")
     patient: Mapped["Patient"] = relationship(back_populates="perscriptions")
+
+    def update(self, d):
+        self.dose = d["dose"]
+        self.every = d["every"]
+        self.amount = d["amount"]
+        self.refills = d["refills"]
+        self.last_filled = d["last_filled"]
+        self.day_supply = d["day_supply"]
+        self.doctor_name = d["doctor_name"]
