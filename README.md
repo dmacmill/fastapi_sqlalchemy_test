@@ -11,8 +11,10 @@ I learned my lesson from the [https://github.com/dmacmill/fastapi_backend](https
 So I will endeavor to write an ORM based backend now. Using [https://fastapi.tiangolo.com/tutorial/sql-databases/#orms](roughly this) app format.
 
 ### Getting Started
-Run `pipenv shell` to enter dev environment
+`docker build -t fastapisqlalchemy .` to build image
 
-Then run `fastapi dev` and go to localhost:8000/docs
+then
 
-`uvicorn app.main:app --reload` when running with these instructions: https://fastapi.tiangolo.com/tutorial/sql-databases/
+`docker compose up`
+
+then go to 0.0.0.0:8000/docs to use fastapi frontend
