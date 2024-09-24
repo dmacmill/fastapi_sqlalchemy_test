@@ -1,0 +1,26 @@
+services:
+  fastapi:
+    image: "fastapisqlalchemy:latest"
+    volumes:
+     - /home/daniel/Documents/sandbox/webapp/fastapi_sqlalchemy/.env:/fastapi_sqlalchemy/.env
+     - /home/daniel/Documents/sandbox/webapp/fastapi_sqlalchemy/app:/fastapi_sqlalchemy/app
+    ports:
+    - 8000:8000
+    depends_on:
+      - db
+
+
+  db:
+    image: postgres:16-alpine
+    restart: always
+    shm_size: 128mb
+    env_file:
+      - .env
+    expose:
+      - 5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+
+volumes:
+  postgres_data:
