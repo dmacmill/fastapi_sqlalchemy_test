@@ -23,4 +23,4 @@ I learned my lesson from previous projects...
 3) ORMs are things you gotta design around, not just squeeze in last minute into a project.
 4) ORMs will probably do SQL better than you, n00b.
 
-So I will endeavor to write an ORM based backend now. Using [https://fastapi.tiangolo.com/tutorial/sql-databases/#orms](roughly this) app format.
+So I will endeavor to write an ORM based backend now. Using [roughly](https://fastapi.tiangolo.com/tutorial/sql-databases/#orms) app format.
