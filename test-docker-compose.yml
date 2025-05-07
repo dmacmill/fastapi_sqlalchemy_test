@@ -4,7 +4,7 @@ services:
       context: .
     image: "fastapisqlalchemy:latest"
     volumes:
-     - ./.env:/app/.env
+     - ./test.env:/app/.env
     ports:
     - 8000:8000
     depends_on:
@@ -18,7 +18,7 @@ services:
     restart: always
     shm_size: 128mb
     env_file:
-      - .env
+      - test.env
     expose:
       - 5432
     volumes:

@@ -1,0 +1,38 @@
+name: Build FastAPI App with Docker Compose
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build Docker Compose services
+      run: docker compose -f test-docker-compose.yml build
+
+    - name: Run containers (in detached mode)
+      run: docker compose -f test-docker-compose.yml up -d
+
+    - name: Wait for app to be ready
+      run: |
+        for i in {1..10}; do
+          curl -sSf http://localhost:8000 && break || sleep 3
+        done
+
+    # - name: Run tests (if any)
+    #   run: |
+    #     echo "You could run integration tests here"
+
+    - name: Stop and clean up containers
+      if: always()
+      run: docker compose -f test-docker-compose.yml down
