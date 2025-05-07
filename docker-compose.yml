@@ -2,8 +2,7 @@ services:
   fastapi:
     image: "fastapisqlalchemy:latest"
     volumes:
-     - /home/daniel/Documents/sandbox/webapp/fastapi_sqlalchemy/.env:/fastapi_sqlalchemy/.env
-     - /home/daniel/Documents/sandbox/webapp/fastapi_sqlalchemy/app:/fastapi_sqlalchemy/app
+     - ./.env:/app/.env
     ports:
     - 8000:8000
     depends_on:

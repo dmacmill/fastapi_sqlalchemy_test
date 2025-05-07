@@ -1,12 +1,14 @@
 FROM tiangolo/uvicorn-gunicorn-fastapi:python3.10
-# tiangolo wants us to use something else, this is deprecated
-# but there's no documentation on the new stuff, so whatever
+# switch over to updated base image someday
 
-COPY alembic/           /fastapi_sqlalchemy/alembic
-COPY requirements.txt   /fastapi_sqlalchemy/
-WORKDIR /fastapi_sqlalchemy/
+WORKDIR /app
+
+COPY requirements.txt  .
 RUN pip install --upgrade pip
 RUN pip3 install -r requirements.txt
+
+RUN mkdir -p /app/app
+COPY app/ app/
 EXPOSE 8000:8000
 
 CMD ["uvicorn", "app.main:app", "--reload", "--host", "0.0.0.0", "--port", "8000"]
