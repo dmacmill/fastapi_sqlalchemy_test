@@ -7,7 +7,6 @@ from starlette.config import Config, environ
 if 'TESTING' in environ:
     config = Config('test.env')
 else:
-    import asyncpg
     config = Config('.env')
 
 settings = {
@@ -21,7 +20,7 @@ settings = {
 }
 
 # TODO: Figure out what can make asyncpg work with SQLAlchemy
-DB_URI = "postgresql+psycopg://{}:{}@{}:{}/{}".format(
+DB_URI = "postgresql+asyncpg://{}:{}@{}:{}/{}".format(
     settings["POSTGRES_USER"],
     settings["POSTGRES_PASSWORD"],
     settings["POSTGRES_HOST"],

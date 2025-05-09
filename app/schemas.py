@@ -34,8 +34,8 @@ class PatientCreate(PatientBase):
     pass
 
 
-# Perscription
-class PerscriptionBase(BaseModel):
+# Prescription
+class PrescriptionBase(BaseModel):
     medication_id: int
     patient_id: int
     dose: str
@@ -50,21 +50,21 @@ class PerscriptionBase(BaseModel):
         from_attributes = True
 
 
-class PerscriptionCreate(PerscriptionBase):
+class PrescriptionCreate(PrescriptionBase):
     pass
 
 
 class Medication(MedicationBase):
     id: int
-    perscriptions: list[PerscriptionBase] = []
+    prescriptions: list[PrescriptionBase] = []
 
 
 class Patient(PatientBase):
     id: int
-    perscriptions: list[PerscriptionBase] = []
+    prescriptions: list[PrescriptionBase] = []
 
 
-class Perscription(PerscriptionBase):
+class Prescription(PrescriptionBase):
     id: int
     medication: MedicationBase
     patient: PatientBase

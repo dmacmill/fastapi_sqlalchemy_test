@@ -2,38 +2,37 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from app import crud, schemas
 from app.db import get_db
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 router = APIRouter()
 
-
-@router.get("/all_perscriptions")
-def all_perscriptions(db: Session = Depends(get_db)):
-    perscriptions = crud.get_all_perscriptions(db)
-    return perscriptions
-
-
-@router.get("/perscription/{id}", response_model=schemas.Perscription)
-def get_perscription(id: int, 
-                db: Session = Depends(get_db)):
-    return crud.get_perscription(db=db, perscription_id=id)
+@router.get("/all_prescriptions")
+async def all_prescriptions(db: AsyncSession = Depends(get_db)):
+    prescriptions = await crud.get_all_prescriptions(db)
+    return prescriptions
 
 
-@router.post("/perscription", response_model=schemas.Perscription)
-def create_perscription(perscription: schemas.PerscriptionCreate, 
-                   db: Session = Depends(get_db)):
-    return crud.create_perscription(db=db, perscription=perscription)
+@router.get("/prescription/{id}", response_model=schemas.Prescription)
+async def get_prescription(id: int, 
+                db: AsyncSession = Depends(get_db)):
+    return await crud.get_prescription(db=db, prescription_id=id)
 
 
-@router.patch("/perscription/{id}", response_model=schemas.Perscription)
-def update_perscription(id: int,
-                   perscription: schemas.PerscriptionCreate,
-                   db: Session = Depends(get_db)):
-    return crud.update_perscription(db=db, perscription_id=id, perscription=perscription)
+@router.post("/prescription", response_model=schemas.Prescription)
+async def create_prescription(prescription: schemas.PrescriptionCreate, 
+                   db: AsyncSession = Depends(get_db)):
+    return await crud.create_prescription(db=db, prescription=prescription)
 
 
-@router.delete("/perscription/{id}", response_model=schemas.Perscription)
-def delete_perscription(id: int,
-                   db: Session = Depends(get_db)):
-    return crud.delete_perscription(db, id)
+@router.patch("/prescription/{id}", response_model=schemas.Prescription)
+async def update_prescription(id: int,
+                   prescription: schemas.PrescriptionCreate,
+                   db: AsyncSession = Depends(get_db)):
+    return await crud.update_prescription(db=db, prescription_id=id, prescription=prescription)
+
+
+@router.delete("/prescription/{id}", response_model=schemas.Prescription)
+async def delete_prescription(id: int,
+                   db: AsyncSession = Depends(get_db)):
+    return await crud.delete_prescription(db, id)
