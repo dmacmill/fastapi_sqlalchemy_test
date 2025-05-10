@@ -1,43 +1,46 @@
 from fastapi import HTTPException
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Session
-from sqlalchemy import asc
+from sqlalchemy.orm import selectinload
+from sqlalchemy import asc, select
 
-from . import models
+from . import models, schemas
 import asyncio
 
 
 async def get_all_medications(db: AsyncSession):
     result = await db.execute(
-        models.Medication.__table__.select().order_by(models.Medication.id)
+        select(models.Medication).order_by(asc(models.Medication.id))
     )
     return result.scalars().all()
 
 
 async def get_all_patients(db: AsyncSession):
     result = await db.execute(
-        models.Patient.__table__.select().order_by(models.Patient.id)
+        select(models.Patient).order_by(models.Patient.id)
     )
     return result.scalars().all()
 
 
 async def get_all_prescriptions(db: AsyncSession):
     result = await db.execute(
-        models.Prescription.__table__.select().order_by(models.Prescription.id)
+        select(models.Prescription).order_by(models.Prescription.id)
     )
     return result.scalars().all()
 
 
 async def get_medication(db: AsyncSession, medication_id: int):
     result = await db.execute(
-        models.Medication.__table__.select().where(models.Medication.id == medication_id)
+        select(models.Medication)
+        .options(selectinload(models.Medication.prescriptions))
+        .where(models.Medication.id == medication_id)
     )
     res = result.scalar_one_or_none()
     if res is None:
         raise HTTPException(status_code=404, detail=f"medication with id {medication_id} not found")
     return res
 
+# TODO: add selectinload for the rest of where needed
 
 async def get_patient(db: AsyncSession, patient_id: int):
     result = await db.execute(

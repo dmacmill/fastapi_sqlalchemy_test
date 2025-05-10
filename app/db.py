@@ -19,8 +19,6 @@ AsyncSessionLocal = async_sessionmaker(
     autocommit=False
 )
 
-Base = declarative_base()
-
 # Dependency
 async def get_db():
     async with AsyncSessionLocal() as session:

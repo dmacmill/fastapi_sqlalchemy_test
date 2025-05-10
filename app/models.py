@@ -2,11 +2,12 @@ from datetime import date
 from typing import List, Optional
 
 from sqlalchemy import ForeignKey
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
-from sqlalchemy.orm import relationship
+from sqlalchemy.ext.asyncio import AsyncAttrs
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
-from .db import Base
+
+class Base(AsyncAttrs, DeclarativeBase):
+    pass
 
 
 class Medication(Base):

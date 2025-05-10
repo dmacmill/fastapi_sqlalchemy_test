@@ -12,7 +12,7 @@ class MedicationBase(BaseModel):
     stock: int
 
     class Config:
-        from_attributes = True
+        from_attributes = True  # once was "orm_mode = True"
 
 
 class MedicationCreate(MedicationBase):
