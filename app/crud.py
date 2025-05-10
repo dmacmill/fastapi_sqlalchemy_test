@@ -10,21 +10,28 @@ import asyncio
 
 async def get_all_medications(db: AsyncSession):
     result = await db.execute(
-        select(models.Medication).order_by(asc(models.Medication.id))
+        select(models.Medication)
+        .options(selectinload(models.Medication.prescriptions))
+        .order_by(asc(models.Medication.id))
     )
     return result.scalars().all()
 
 
 async def get_all_patients(db: AsyncSession):
     result = await db.execute(
-        select(models.Patient).order_by(models.Patient.id)
+        select(models.Patient)
+        .options(selectinload(models.Patient.prescriptions))
+        .order_by(models.Patient.id)
     )
     return result.scalars().all()
 
 
 async def get_all_prescriptions(db: AsyncSession):
     result = await db.execute(
-        select(models.Prescription).order_by(models.Prescription.id)
+        select(models.Prescription)
+        .options(selectinload(models.Prescription.medication),
+                 selectinload(models.Prescription.patient))
+        .order_by(models.Prescription.id)
     )
     return result.scalars().all()
 
@@ -40,11 +47,11 @@ async def get_medication(db: AsyncSession, medication_id: int):
         raise HTTPException(status_code=404, detail=f"medication with id {medication_id} not found")
     return res
 
-# TODO: add selectinload for the rest of where needed
-
 async def get_patient(db: AsyncSession, patient_id: int):
     result = await db.execute(
-        models.Patient.__table__.select().where(models.Patient.id == patient_id)
+        select(models.Patient)
+        .options(selectinload(models.Patient.prescriptions))
+        .where(models.Patient.id == patient_id)
     )
     res = result.scalar_one_or_none()
     if res is None:
@@ -54,7 +61,10 @@ async def get_patient(db: AsyncSession, patient_id: int):
 
 async def get_prescription(db: AsyncSession, prescription_id: int):
     result = await db.execute(
-        models.Prescription.__table__.select().where(models.Prescription.id == prescription_id)
+        select(models.Prescription)
+        .options(selectinload(models.Prescription.medication), 
+                 selectinload(models.Prescription.patient))
+        .where(models.Prescription.id == prescription_id)
     )
     res = result.scalar_one_or_none()
     if res is None:
@@ -64,7 +74,9 @@ async def get_prescription(db: AsyncSession, prescription_id: int):
 
 async def update_medication(db: AsyncSession, medication_id: int, medication: models.Medication):
     result = await db.execute(
-        models.Medication.__table__.select().where(models.Medication.id == medication_id)
+        select(models.Medication)
+        .options(selectinload(models.Medication.prescriptions))
+        .where(models.Medication.id == medication_id)
     )
     res = result.scalar_one_or_none()
     if res is None:
@@ -79,7 +91,9 @@ async def update_medication(db: AsyncSession, medication_id: int, medication: mo
 
 async def update_patient(db: AsyncSession, patient_id: int, patient: models.Patient):
     result = await db.execute(
-        models.Patient.__table__.select().where(models.Patient.id == patient_id)
+        select(models.Patient)
+        .options(selectinload(models.Patient.prescriptions))
+        .where(models.Patient.id == patient_id)
     )
     res = result.scalar_one_or_none()
     if res is None:
@@ -94,7 +108,10 @@ async def update_patient(db: AsyncSession, patient_id: int, patient: models.Pati
 
 async def update_perscription(db: AsyncSession, prescription_id: int, prescription: models.Prescription):
     result = await db.execute(
-        models.Prescription.__table__.select().where(models.Prescription.id == prescription_id)
+        select(models.Prescription)
+        .options(selectinload(models.Prescription.medication),
+                 selectinload(models.Prescription.patient))
+        .where(models.Prescription.id == prescription_id)
     )
     res = result.scalar_one_or_none()
     if res is None:
@@ -107,30 +124,61 @@ async def update_perscription(db: AsyncSession, prescription_id: int, prescripti
     return res
 
 
-async def create_medication(db: AsyncSession, medication: models.Medication):
-    db.add(medication)
+async def create_medication(db: AsyncSession, medication: schemas.MedicationCreate):
+    db_model = models.Medication(**medication.model_dump())
+    db.add(db_model)
     await db.commit()
-    await db.refresh(medication)
-    return medication
+    await db.refresh(db_model)
+
+    # eager-load prescriptions so FastAPI doesn't lazy load them later
+    # TODO: maybe just don't return a medication at all...
+    result = await db.execute(
+        select(models.Medication)
+        .options(selectinload(models.Medication.prescriptions))
+        .where(models.Medication.id == db_model.id)
+    )
+    db_model_with_rel = result.scalar_one_or_none()
+    return db_model_with_rel
 
 
-async def create_patient(db: AsyncSession, patient: models.Patient):
-    db.add(patient)
+async def create_patient(db: AsyncSession, patient: schemas.PatientCreate):
+    db_model = models.Patient(**patient.model_dump())
+    db.add(db_model)
     await db.commit()
-    await db.refresh(patient)
-    return patient
+    await db.refresh(db_model)
+
+    # eager-load prescriptions so FastAPI doesn't lazy load them later
+    result = await db.execute(
+        select(models.Patient)
+        .options(selectinload(models.Patient.prescriptions))
+        .where(models.Patient.id == db_model.id)
+    )
+    db_model_with_rel = result.scalar_one_or_none()
+    return db_model_with_rel
 
 
-async def create_prescription(db: AsyncSession, prescription: models.Prescription):
-    db.add(prescription)
+async def create_prescription(db: AsyncSession, prescription: schemas.PrescriptionCreate):
+    db_model = models.Prescription(**prescription.model_dump())
+    db.add(db_model)
     await db.commit()
-    await db.refresh(prescription)
-    return prescription
+    await db.refresh(db_model)
+
+    # eager-load medication and patient so FastAPI doesn't lazy load them later
+    result = await db.execute(
+        select(models.Prescription)
+        .options(selectinload(models.Prescription.medication),
+                 selectinload(models.Prescription.patient))
+        .where(models.Prescription.id == db_model.id)
+    )
+    db_model_with_rel = result.scalar_one_or_none()
+    return db_model_with_rel
 
 
 async def delete_medication(db: AsyncSession, id: int):
     result = await db.execute(
-        models.Medication.__table__.select().where(models.Medication.id == id)
+        select(models.Medication)
+        .options(selectinload(models.Medication.prescriptions))
+        .where(models.Medication.id == id)
     )
     med = result.scalar_one_or_none()
     if med is None:
@@ -142,7 +190,9 @@ async def delete_medication(db: AsyncSession, id: int):
 
 async def delete_patient(db: AsyncSession, id: int):
     result = await db.execute(
-        models.Patient.__table__.select().where(models.Patient.id == id)
+        select(models.Patient)
+        .options(selectinload(models.Patient.prescriptions))
+        .where(models.Patient.id == id)
     )
     patient = result.scalar_one_or_none()
     if patient is None:
@@ -154,7 +204,10 @@ async def delete_patient(db: AsyncSession, id: int):
 
 async def delete_prescription(db: AsyncSession, id: int):
     result = await db.execute(
-        models.Prescription.__table__.select().where(models.Prescription.id == id)
+        select(models.Prescription)
+        .options(selectinload(models.Prescription.medication),
+                 selectinload(models.Prescription.patient))
+        .where(models.Prescription.id == id)
     )
     prescription = result.scalar_one_or_none()
     if prescription is None:
