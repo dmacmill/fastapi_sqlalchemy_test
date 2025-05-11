@@ -130,15 +130,8 @@ async def create_medication(db: AsyncSession, medication: schemas.MedicationCrea
     await db.commit()
     await db.refresh(db_model)
 
-    # eager-load prescriptions so FastAPI doesn't lazy load them later
-    # TODO: maybe just don't return a medication at all...
-    result = await db.execute(
-        select(models.Medication)
-        .options(selectinload(models.Medication.prescriptions))
-        .where(models.Medication.id == db_model.id)
-    )
-    db_model_with_rel = result.scalar_one_or_none()
-    return db_model_with_rel
+    db_model.prescriptions = []
+    return db_model
 
 
 async def create_patient(db: AsyncSession, patient: schemas.PatientCreate):
@@ -147,14 +140,8 @@ async def create_patient(db: AsyncSession, patient: schemas.PatientCreate):
     await db.commit()
     await db.refresh(db_model)
 
-    # eager-load prescriptions so FastAPI doesn't lazy load them later
-    result = await db.execute(
-        select(models.Patient)
-        .options(selectinload(models.Patient.prescriptions))
-        .where(models.Patient.id == db_model.id)
-    )
-    db_model_with_rel = result.scalar_one_or_none()
-    return db_model_with_rel
+    db_model.prescriptions = []
+    return db_model
 
 
 async def create_prescription(db: AsyncSession, prescription: schemas.PrescriptionCreate):
@@ -163,15 +150,9 @@ async def create_prescription(db: AsyncSession, prescription: schemas.Prescripti
     await db.commit()
     await db.refresh(db_model)
 
-    # eager-load medication and patient so FastAPI doesn't lazy load them later
-    result = await db.execute(
-        select(models.Prescription)
-        .options(selectinload(models.Prescription.medication),
-                 selectinload(models.Prescription.patient))
-        .where(models.Prescription.id == db_model.id)
-    )
-    db_model_with_rel = result.scalar_one_or_none()
-    return db_model_with_rel
+    db_model.medication = []
+    db_model.patient = []
+    return db_model
 
 
 async def delete_medication(db: AsyncSession, id: int):
