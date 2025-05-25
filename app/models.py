@@ -18,7 +18,7 @@ class Medication(Base):
     use_case: Mapped[str] = mapped_column()
     stock: Mapped[int] = mapped_column(nullable=False, server_default="0")
 
-    prescriptions: Mapped[List["Prescription"]] = relationship(back_populates="medication")
+    prescriptions: Mapped[List["Prescription"]] = relationship(back_populates="medication", lazy="selectin")
 
     def update(self, d):
         self.name = d["name"]
@@ -36,7 +36,7 @@ class Patient(Base):
     insurance_num: Mapped[str] = mapped_column()
     insurance_type: Mapped[str] = mapped_column()
 
-    prescriptions: Mapped[List["Prescription"]] = relationship(back_populates="patient")
+    prescriptions: Mapped[List["Prescription"]] = relationship(back_populates="patient", lazy="selectin")
 
     def update(self, d):
         self.name = d["name"]
@@ -60,8 +60,8 @@ class Prescription(Base):
     day_supply: Mapped[int] = mapped_column(nullable=False)
     doctor_name: Mapped[Optional[str]]
 
-    medication: Mapped["Medication"] = relationship(back_populates="prescriptions")
-    patient: Mapped["Patient"] = relationship(back_populates="prescriptions")
+    medication: Mapped["Medication"] = relationship(back_populates="prescriptions", lazy="selectin")
+    patient: Mapped["Patient"] = relationship(back_populates="prescriptions", lazy="selectin")
 
     def update(self, d):
         self.medication_id = d["medication_id"]
