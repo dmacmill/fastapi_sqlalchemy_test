@@ -5,8 +5,10 @@ from starlette.config import Config, environ
 # import settings
 ######################################################################
 if 'TESTING' in environ:
+    TESTING = True
     config = Config('test.env')
 else:
+    TESTING = False
     config = Config('.env')
 
 POSTGRES_USER= config("POSTGRES_USER", cast=str, default="postgres")

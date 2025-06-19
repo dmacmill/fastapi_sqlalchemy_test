@@ -12,23 +12,22 @@ from app.api.api import router
 from app import models
 from app.models import Medication, Patient, Prescription # needed for pytest to see
 from app.db import engine
+from app.settings import TESTING
 
 
-# create the database tables
-async def on_startup():
-    async with engine.begin() as conn:
-        await conn.run_sync(models.Base.metadata.create_all)
-
-# define how the app's life will run. "await on_startup()" creates the tables in the db, yield runs things,
-# and stuff after yield cleans things up 
+# define how the app's life will run. create the tables in the db, yield runs things,
+# and stuff after yield cleans things up if necessary
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # await on_startup()
     LOGGER.warning("lifespan starting!!!")
-    yield # run
-    LOGGER.warning("lifespan ending!!!!")
     async with engine.begin() as conn:
-        await conn.run_sync(models.Base.metadata.destroy_all)
+        await conn.run_sync(models.Base.metadata.create_all)
+    
+    yield # run
+    if TESTING:
+        async with engine.begin() as conn:
+            await conn.run_sync(models.Base.metadata.drop_all)
+    LOGGER.warning("lifespan ending!!!!")
 
 description = """FastAPI with SQLAlchemy, aimed for small-scale projects and educational purposes."""
 app = FastAPI(
