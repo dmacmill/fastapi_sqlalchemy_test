@@ -31,7 +31,7 @@ jobs:
         done
 
     - name: Run tests (if any)
-      run: docker exec fastapi_sqlalchemy-fastapi-1 pytest app/test -v --maxfail=1
+      run: docker exec fastapi_sqlalchemy_test-fastapi-1 pytest app/test -v --maxfail=1
 
     - name: Stop and clean up containers
       if: always()
