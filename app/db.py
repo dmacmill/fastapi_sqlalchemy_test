@@ -1,6 +1,8 @@
 from sqlalchemy import create_engine, text
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from sqlalchemy.orm import declarative_base
+from typing import AsyncGenerator
+
 
 from .settings import DB_URI, POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB, POSTGRES_HOST, POSTGRES_PORT
 
@@ -34,6 +36,6 @@ AsyncSessionLocal = async_sessionmaker(
 )
 
 # Dependency
-async def get_db():
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
     async with AsyncSessionLocal() as session:
         yield session
