@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
+from typing import List
 
 from app import crud, schemas
 from app.db import get_db
@@ -7,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter()
 
-@router.get("/all_prescriptions")
+@router.get("/all_prescriptions", response_model=List[schemas.Prescription])
 async def all_prescriptions(db: AsyncSession = Depends(get_db)):
     prescriptions = await crud.get_all_prescriptions(db)
     return prescriptions
