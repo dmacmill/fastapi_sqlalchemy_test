@@ -5,6 +5,7 @@ services:
     image: "fastapisqlalchemy:latest"
     volumes:
      - ./.env:/app/.env
+     - ./app:/app/app
     ports:
     - 8000:8000
     depends_on:

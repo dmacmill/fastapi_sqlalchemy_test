@@ -7,7 +7,6 @@ COPY requirements.txt  .
 RUN pip install --upgrade pip
 RUN pip3 install -r requirements.txt
 
-RUN mkdir -p /app/app
 COPY app/ app/
 EXPOSE 8000:8000
 

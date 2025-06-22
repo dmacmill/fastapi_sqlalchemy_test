@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - dm-endpoint-tests
   pull_request:
 
 jobs:
@@ -29,9 +30,8 @@ jobs:
           curl -sSf http://localhost:8000 && break || sleep 3
         done
 
-    # - name: Run tests (if any)
-    #   run: |
-    #     echo "You could run integration tests here"
+    - name: Run tests (if any)
+      run: docker exec fastapi_sqlalchemy_test-fastapi-1 pytest app/test -v --maxfail=1
 
     - name: Stop and clean up containers
       if: always()

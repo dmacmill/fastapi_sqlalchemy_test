@@ -4,7 +4,10 @@ services:
       context: .
     image: "fastapisqlalchemy:latest"
     volumes:
-     - ./test.env:/app/.env
+     - ./test.env:/app/test.env
+     - ./app:/app/app
+    environment:
+      - TESTING=true
     ports:
     - 8000:8000
     depends_on:
