@@ -11,9 +11,6 @@ then
 
 then go to 0.0.0.0:8000/docs to use fastapi frontend
 
-### TODO
- - Testing endpoints
-
 ### why this exists
 I needed more practice with ORMs as using them is generally better practice than using inline SQL. So I will endeavor to write an ORM based backend now. Using [roughly this](https://fastapi.tiangolo.com/tutorial/sql-databases/#orms) app format.
 
