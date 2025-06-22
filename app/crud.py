@@ -106,7 +106,7 @@ async def update_patient(db: AsyncSession, patient_id: int, patient: models.Pati
     return res
 
 
-async def update_perscription(db: AsyncSession, prescription_id: int, prescription: models.Prescription):
+async def update_prescription(db: AsyncSession, prescription_id: int, prescription: models.Prescription):
     result = await db.execute(
         select(models.Prescription)
         .options(selectinload(models.Prescription.medication),
@@ -149,9 +149,7 @@ async def create_prescription(db: AsyncSession, prescription: schemas.Prescripti
     db.add(db_model)
     await db.commit()
     await db.refresh(db_model)
-
-    db_model.medication = []
-    db_model.patient = []
+    # for now, prescriptions must be created with a patient and a medication
     return db_model
 
 

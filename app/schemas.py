@@ -58,16 +58,25 @@ class Medication(MedicationBase):
     id: int
     prescriptions: list[PrescriptionBase] = []
 
+    class Config:
+        from_attributes = True
+
 
 class Patient(PatientBase):
     id: int
     prescriptions: list[PrescriptionBase] = []
+
+    class Config:
+        from_attributes = True
 
 
 class Prescription(PrescriptionBase):
     id: int
     medication: MedicationBase
     patient: PatientBase
+
+    class Config:
+        from_attributes = True
 
 
 Medication.model_rebuild()
