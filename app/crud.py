@@ -81,7 +81,7 @@ async def update_medication(db: AsyncSession, medication_id: int, medication: mo
     res = result.scalar_one_or_none()
     if res is None:
         raise HTTPException(status_code=404, detail=f"medication with id {medication_id} not found")
-    for key, value in medication.dict().items():
+    for key, value in medication.model_dump().items():
         setattr(res, key, value)
     db.add(res)
     await db.commit()
@@ -98,7 +98,7 @@ async def update_patient(db: AsyncSession, patient_id: int, patient: models.Pati
     res = result.scalar_one_or_none()
     if res is None:
         raise HTTPException(status_code=404, detail=f"patient with id {patient_id} not found")
-    for key, value in patient.dict().items():
+    for key, value in patient.model_dump().items():
         setattr(res, key, value)
     db.add(res)
     await db.commit()
@@ -116,7 +116,7 @@ async def update_prescription(db: AsyncSession, prescription_id: int, prescripti
     res = result.scalar_one_or_none()
     if res is None:
         raise HTTPException(status_code=404, detail=f"prescription with id {prescription_id} not found")
-    for key, value in prescription.dict().items():
+    for key, value in prescription.model_dump().items():
         setattr(res, key, value)
     db.add(res)
     await db.commit()
