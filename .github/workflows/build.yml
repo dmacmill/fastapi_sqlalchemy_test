@@ -36,7 +36,7 @@ jobs:
 
         # wait for health to become "healthy" (60s total by default)
         for i in $(seq 1 60); do
-          status=$(docker inspect --format='{{.State.Health.Status}}' "$container_id" 2>/dev/null || echo "no_health")
+          status=$(docker inspect --format='{{.State.Health.Status}}' "$db_id" 2>/dev/null || echo "no_health")
           if [ "$status" = "healthy" ]; then
             echo "db is healthy"
             break
