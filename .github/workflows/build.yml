@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - dm-update-ver
   pull_request:
 
 jobs:
@@ -20,17 +21,45 @@ jobs:
     - name: Build Docker Compose services
       run: docker compose -f test-docker-compose.yml build
 
-    - name: Run containers (in detached mode)
-      run: docker compose -f test-docker-compose.yml up -d
+    - name: Run database container (in detached mode)
+      run: docker compose -f test-docker-compose.yml up -d db
 
-    - name: Wait for app to be ready
+    - name: Wait for db to be ready then run fastapi
       run: |
-        for i in {1..10}; do
-          curl -sSf http://localhost:8000 && break || sleep 3
+        # getting db container id
+        db_id=$(docker compose -f test-docker-compose.yml ps -q db)
+        if [ -z "$db_id" ];then
+          echo "Failed to get db container ID :<"
+          docker compose -f test-docker-compose.yml logs db || true
+          exit 1
+        fi
+
+        # wait for health to become "healthy" (60s total by default)
+        for i in $(seq 1 60); do
+          status=$(docker inspect --format='{{.State.Health.Status}}' "$db_id" 2>/dev/null || echo "no_health")
+          if [ "$status" = "healthy" ]; then
+            echo "db is healthy"
+            break
+          fi
+          echo "Waiting for db health ($i/60) status=$status"
+          if [ "$i" -eq 60 ]; then
+            echo "DB did not become healthy in time"
+            docker compose -f test-docker-compose.yml logs db
+            exit 1
+          fi
+          sleep 1
         done
 
+        # then run fastapi
+        docker compose -f test-docker-compose.yml up -d --no-deps fastapi
+
     - name: Run tests (if any)
-      run: docker exec fastapi_sqlalchemy_test-fastapi-1 pytest app/test -v --maxfail=1
+      run: |
+        # run the tests
+        docker exec fastapi_sqlalchemy_test-fastapi-1 pytest app/test -v --maxfail=1
+
+        # View container logs for debugging
+        docker compose -f test-docker-compose.yml logs
 
     - name: Stop and clean up containers
       if: always()

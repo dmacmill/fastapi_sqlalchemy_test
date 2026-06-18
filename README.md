@@ -11,8 +11,11 @@ then
 
 then 127.0.0.1:8000/docs to test the backend.
 
-### why this exists
-I needed more practice with ORMs as using them is generally better practice than using inline SQL. So I will endeavor to write an ORM based backend now. Using [roughly this](https://fastapi.tiangolo.com/tutorial/sql-databases/#orms) app format.
+# run tests
+Make sure you use the test-docker-compose.yml build
+`docker compose -f test-docker-compose.yml`
+`docker compose -f test-docker-compose up`
 
-I also wanted more projects on my page with docker compose to show off that I know that, as well as regression and performance testing.
+then
 
+`docker exec -it fastapi_sqlalchemy-fastapi-1 pytest app/test/`
