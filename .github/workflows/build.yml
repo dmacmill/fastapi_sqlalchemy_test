@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - dm-update-ver
   pull_request:
 
 jobs:
@@ -25,22 +26,28 @@ jobs:
 
     - name: Wait for app to be ready
       run: |
-        # check if container is running
-        docker ps | grep fastapi_sqlalchemy_test-fastapi-1 || docker ps -a | grep fastapi_sqlalchemy_test-fastapi-1
-
-        # View container logs for debugging
-        docker compose -f test-docker-compose.yml logs
-
-        # give some time for startup
-        for i in {1..20}; do
-          curl -sSf http://localhost:8000 && break || sleep 3
+        echo "Waiting for FastAPI app to be ready..."
+        for i in {1..30}; do
+          echo "Attempt $i of 30..."
+          if curl -sSf http://localhost:8000/docs > /dev/null 2>&1; then
+            echo "✓ App is ready!"
+            exit 0
+          fi
+          if [ $i -eq 30 ]; then
+            echo "✗ App failed to start after 30 attempts"
+            echo ""
+            echo "Container logs for debugging:"
+            docker compose -f test-docker-compose.yml logs
+            exit 1
+          fi
+          sleep 2
         done
 
     - name: Run tests (if any)
       run: |
         # run the tests
         docker exec fastapi_sqlalchemy_test-fastapi-1 pytest app/test -v --maxfail=1
-        
+
         # View container logs for debugging
           docker compose -f test-docker-compose.yml logs
 
